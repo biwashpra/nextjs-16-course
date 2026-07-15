@@ -1,5 +1,6 @@
 "use client";
 
+import { blogPostSchema, IBlogPost } from "@/app/schemas/blog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,29 +17,39 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
-import z from "zod";
+import { toast } from "sonner";
 
 export default function CreateRoute() {
+  const mutation = useMutation(api.posts.createPost);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm({
-    resolver: zodResolver(postSchema),
+    resolver: zodResolver(blogPostSchema),
     defaultValues: {
       content: "",
       title: "",
-      image: undefined,
     },
   });
 
-  function onSubmit(values) {
+  function onSubmit(data: IBlogPost) {
     startTransition(async () => {
       console.log("hey this runs on the client side");
+
+      await mutation({
+        title: data.title,
+        content: data.content,
+      });
+
+      toast.success("Post created successfully.");
+      router.push("/");
     });
   }
   return (
@@ -96,7 +107,7 @@ export default function CreateRoute() {
                 )}
               />
 
-              <Controller
+              {/* <Controller
                 name="image"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -117,9 +128,9 @@ export default function CreateRoute() {
                     )}
                   </Field>
                 )}
-              />
+              /> */}
 
-              <Button disabled={isPending}>
+              <Button disabled={isPending} type="submit">
                 {isPending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
