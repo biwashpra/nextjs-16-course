@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ILoginForm, loginSchema } from "@/app/auth/schemas/auth";
+import { ILoginForm, loginSchema } from "@/app/schemas/auth";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
