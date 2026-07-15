@@ -1,6 +1,5 @@
 "use client";
 
-import { ISignUpForm, signUpSchema } from "@/app/auth/schemas/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,42 +17,42 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ILoginForm, loginSchema } from "@/app/auth/schemas/auth";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-const SignUpForm = () => {
+const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const form = useForm({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (data: ISignUpForm) => {
+  const onSubmit = (data: ILoginForm) => {
     startTransition(async () => {
-      await authClient.signUp.email({
-        name: data.name,
+      await authClient.signIn.email({
         email: data.email,
         password: data.password,
 
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Signed up successfully");
+            toast.success("Logged in successfully");
             router.replace("/");
           },
           onError: (error) => {
-            toast.error("Failed to sign up!", {
+            toast.error("Failed to log in!", {
               description: error.error.message,
             });
           },
@@ -63,16 +62,16 @@ const SignUpForm = () => {
   };
 
   return (
-    <section className="bg-foreground dark:bg-background min-h-screen relative flex items-center justify-center">
+    <section className="bg-foreground dark:bg-background min-h-screen flex items-center justify-center relative">
       <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
-        <Card className="max-w-lg px-6 py-8 sm:p-12 relative">
+        <Card className="max-w-lg px-6 py-8 sm:p-12 relative gap-6">
           <CardHeader className="text-center gap-6 p-0">
             <div className="flex flex-col gap-1">
               <CardTitle className="text-2xl font-medium text-card-foreground">
-                Signup to Next Pro
+                Welcome to Next Pro
               </CardTitle>
               <CardDescription className="text-sm text-muted-foreground font-normal">
-                Signup to your account now
+                Login to your account now
               </CardDescription>
             </div>
           </CardHeader>
@@ -83,48 +82,23 @@ const SignUpForm = () => {
                   <Button
                     variant="outline"
                     type="button"
-                    className="text-sm text-medium text-card-foreground gap-2 cursor-pointer dark:bg-background rounded-lg h-9 shadow-xs"
+                    className="text-sm text-medium text-card-foreground gap-2 dark:bg-background rounded-lg h-9 shadow-xs cursor-pointer"
                   >
-                    Sign up with Google
+                    Sign in with Google
                   </Button>
                   <Button
                     variant="outline"
                     type="button"
-                    className="text-sm text-medium text-card-foreground gap-2 cursor-pointer dark:bg-background rounded-lg h-9 shadow-xs"
+                    className="text-sm text-medium text-card-foreground gap-2 dark:bg-background rounded-lg h-9 shadow-xs cursor-pointer"
                   >
-                    Sign up with Github
+                    Sign in with Github
                   </Button>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-sm text-muted-foreground bg-transparent">
-                  <span className="px-4">or sign up with</span>
+                  <span className="px-4">or sign in with</span>
                 </FieldSeparator>
 
                 <div className="flex flex-col gap-4">
-                  <Controller
-                    name="name"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field className="gap-1.5">
-                        <FieldLabel
-                          htmlFor="name"
-                          className="text-sm text-muted-foreground font-normal"
-                        >
-                          Name*
-                        </FieldLabel>
-                        <Input
-                          aria-invalid={fieldState.invalid}
-                          type="text"
-                          placeholder="enter your name"
-                          className="dark:bg-background shadow-xs h-9"
-                          {...field}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-
                   <Controller
                     name="email"
                     control={form.control}
@@ -179,28 +153,51 @@ const SignUpForm = () => {
                   />
                 </div>
 
+                <Field orientation="horizontal" className="justify-between">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      id="terms"
+                      defaultChecked
+                      className="cursor-pointer"
+                    />
+                    <FieldLabel
+                      htmlFor="terms"
+                      className="text-sm text-primary font-normal cursor-pointer"
+                    >
+                      Remember this device
+                    </FieldLabel>
+                  </div>
+                  <Link
+                    href="/"
+                    className="text-sm text-card-foreground font-medium text-end"
+                  >
+                    Forgot password?
+                  </Link>
+                </Field>
+
                 <Field className="gap-4">
                   <Button
                     type="submit"
                     size={"lg"}
-                    className="rounded-lg cursor-pointer h-10 hover:bg-primary/80"
+                    className="rounded-lg h-10 hover:bg-primary/80 cursor-pointer"
+                    disabled={isPending}
                   >
                     {isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" /> Signing
-                        up...
+                        <Loader2 className="w-4 h-4 animate-spin" /> Logging
+                        in...
                       </>
                     ) : (
-                      "Sign up"
+                      "Log in"
                     )}
                   </Button>
                   <FieldDescription className="text-center text-sm font-normal text-muted-foreground">
-                    Already have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link
-                      href="/auth/login"
+                      href="/auth/sign-up"
                       className="font-medium text-card-foreground no-underline!"
                     >
-                      Log in
+                      Create an account
                     </Link>
                   </FieldDescription>
                 </Field>
@@ -213,4 +210,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default LoginForm;
