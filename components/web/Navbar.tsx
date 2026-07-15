@@ -1,3 +1,5 @@
+import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/web/theme-toggle";
 import Link from "next/link";
 
 export const Navbar = () => {
@@ -12,14 +14,28 @@ export const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        <Link href="/">Home</Link>
-        <Link href="/blog">Blog</Link>
-        <Link href="/create">Create</Link>
+        <Link href="/" className={buttonVariants({ variant: "ghost" })}>
+          Home
+        </Link>
+        <Link href="/blog" className={buttonVariants({ variant: "ghost" })}>
+          Blog
+        </Link>
+        <Link href="/create" className={buttonVariants({ variant: "ghost" })}>
+          Create
+        </Link>
       </div>
 
       <div className="flex items-center gap-2">
-        <Link href="/auth/signup">Sign Up</Link>
-        <Link href="/auth/login">Log In</Link>
+        <Link href="/auth/sign-up" className={buttonVariants()}>
+          Sign Up
+        </Link>
+        <Link
+          href="/auth/login"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Log In
+        </Link>
+        <ThemeToggle />
       </div>
     </nav>
   );
