@@ -4,7 +4,11 @@ import { authComponent } from "./auth";
 
 // Create a new blog post
 export const createPost = mutation({
-  args: { title: v.string(), content: v.string() },
+  args: {
+    title: v.string(),
+    content: v.string(),
+    imageStorageId: v.id("_storage"),
+  },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
@@ -14,6 +18,7 @@ export const createPost = mutation({
     const newBlog = await ctx.db.insert("posts", {
       title: args.title,
       content: args.content,
+      imageStorageId: args.imageStorageId,
       authorId: user._id,
     });
     return newBlog;
@@ -21,10 +26,37 @@ export const createPost = mutation({
 });
 
 // Get all the blog post
-export const getPost = query({
+export const getPosts = query({
   args: {},
   handler: async (ctx) => {
     const posts = await ctx.db.query("posts").order("desc").collect();
-    return posts;
+    return await Promise.all(
+      posts.map(async (post) => {
+        const resolvedImageUrl =
+          post.imageStorageId !== undefined
+            ? await ctx.storage.getUrl(post.imageStorageId)
+            : null;
+
+        console.log("resolve", resolvedImageUrl);
+
+        return {
+          ...post,
+          imageUrl: resolvedImageUrl,
+        };
+      }),
+    );
+  },
+});
+
+// Generate presigned URL using convex storage
+export const generateImageUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      throw new ConvexError("Not authenticated");
+    }
+
+    return await ctx.storage.generateUploadUrl();
   },
 });

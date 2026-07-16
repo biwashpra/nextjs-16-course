@@ -34,6 +34,7 @@ export default function CreateRoute() {
     defaultValues: {
       content: "",
       title: "",
+      image: undefined,
     },
   });
 
@@ -105,7 +106,7 @@ export default function CreateRoute() {
                 )}
               />
 
-              {/* <Controller
+              <Controller
                 name="image"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -126,7 +127,7 @@ export default function CreateRoute() {
                     )}
                   </Field>
                 )}
-              /> */}
+              />
 
               <Button disabled={isPending} type="submit">
                 {isPending ? (
