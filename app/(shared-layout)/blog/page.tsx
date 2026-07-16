@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { BlogPostLoadingUi } from "@/components/web/BlogPostLoadingUi";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
+import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -27,9 +28,11 @@ export default async function BlogPage() {
 }
 
 async function BlogList() {
+  "use cache";
+  cacheLife("days");
+
   // const blogData = useQuery(api.posts.getPost);
   const blogData = await fetchQuery(api.posts.getPosts);
-  console.log("blog", blogData);
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -4,6 +4,7 @@ import { blogPostSchema, IBlogPost } from "@/app/schemas/blog";
 import { api } from "@/convex/_generated/api";
 import { getToken } from "@/lib/auth-server";
 import { fetchMutation } from "convex/nextjs";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function createBlogAction(data: IBlogPost) {
@@ -53,5 +54,6 @@ export async function createBlogAction(data: IBlogPost) {
     };
   }
 
+  revalidatePath("/blog");
   return redirect("/blog");
 }
