@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "images.unsplash.com",
+        protocol: "https",
+        port: "",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
