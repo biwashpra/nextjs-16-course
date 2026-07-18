@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 interface postIdProps {
   params: Promise<{ postId: Id<"posts"> }>;
@@ -45,6 +46,8 @@ export default async function BlogIdPage({ params }: postIdProps) {
     }),
     await fetchQuery(api.presence.getUserId, {}, { token }),
   ]);
+
+  if (!userId) return redirect("/auth/login");
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in druation-500 relative">
