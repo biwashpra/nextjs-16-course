@@ -3,10 +3,19 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { BlogPostLoadingUi } from "@/components/web/BlogPostLoadingUi";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
+import { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Blog | Next.js 16 course",
+  description:
+    "Read the latest articles and content related to Next.js version 16",
+  category: "Web development",
+  authors: [{ name: "Biwash Pradhan" }],
+};
 
 export default async function BlogPage() {
   return (

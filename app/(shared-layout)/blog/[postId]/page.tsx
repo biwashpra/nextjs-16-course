@@ -3,8 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { CommentSection } from "@/components/web/CommentSection";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { ArrowLeft } from "lucide-react";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,10 +13,33 @@ interface postIdProps {
   params: Promise<{ postId: Id<"posts"> }>;
 }
 
+export async function generateMetadata({
+  params,
+}: postIdProps): Promise<Metadata> {
+  const { postId } = await params;
+  const post = await fetchQuery(api.posts.getPostDetails, { postId });
+
+  if (!post) {
+    return {
+      title: "Title not found",
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.content,
+  };
+}
+
 export default async function BlogIdPage({ params }: postIdProps) {
   const { postId } = await params;
 
-  const post = await fetchQuery(api.posts.getPostDetails, { postId });
+  const [post, preloadedComments] = await Promise.all([
+    await fetchQuery(api.posts.getPostDetails, { postId }),
+    await preloadQuery(api.comments.getCommentsByPostId, {
+      postId,
+    }),
+  ]);
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in druation-500 relative">
@@ -62,7 +86,7 @@ export default async function BlogIdPage({ params }: postIdProps) {
 
       <Separator className="my-6" />
 
-      <CommentSection />
+      <CommentSection preloadedComments={preloadedComments} />
     </div>
   );
 }

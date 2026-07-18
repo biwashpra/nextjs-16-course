@@ -10,18 +10,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "convex/react";
+import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
 import { Loader2, MessageSquare } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export const CommentSection = () => {
+export const CommentSection = (props: {
+  preloadedComments: Preloaded<typeof api.comments.getCommentsByPostId>;
+}) => {
   const { postId } = useParams<{ postId: Id<"posts"> }>();
   const [isPending, startTransition] = useTransition();
 
-  const comments = useQuery(api.comments.getCommentsByPostId, { postId });
+  const comments = usePreloadedQuery(props.preloadedComments);
   const createComments = useMutation(api.comments.createComments);
 
   const form = useForm({
@@ -48,7 +50,7 @@ export const CommentSection = () => {
     <Card>
       <CardHeader className="flex flex-row items-center gap-2 border-b">
         <MessageSquare className="size-5" />
-        <h2 className="text-xl font-bold">5 Comments</h2>
+        <h2 className="text-xl font-bold">{comments?.length} Comments</h2>
       </CardHeader>
       <CardContent className="space-y-8">
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
