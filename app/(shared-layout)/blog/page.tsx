@@ -1,13 +1,12 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { BlogPostLoadingUi } from "@/components/web/BlogPostLoadingUi";
+// import { BlogPostLoadingUi } from "@/components/web/BlogPostLoadingUi";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { Metadata } from "next";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Blog | Next.js 16 course",
@@ -29,16 +28,17 @@ export default async function BlogPage() {
         </p>
       </div>
 
-      <Suspense fallback={<BlogPostLoadingUi />}>
-        <BlogList />
-      </Suspense>
+      {/* <Suspense fallback={<BlogPostLoadingUi />}> */}
+      <BlogList />
+      {/* </Suspense> */}
     </div>
   );
 }
 
 async function BlogList() {
   "use cache";
-  cacheLife("days");
+  cacheLife("hours");
+  cacheTag("blog");
 
   // const blogData = useQuery(api.posts.getPost);
   const blogData = await fetchQuery(api.posts.getPosts);
